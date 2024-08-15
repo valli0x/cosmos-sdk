@@ -69,9 +69,21 @@ func NewAccountIndexes(sb *collections.SchemaBuilder) AccountsIndexes {
 	}
 }
 
+func NewAccountIndexesMulti(sb *collections.SchemaBuilder) AccountsIndexes {
+	return AccountsIndexes{
+		NumberMulti: indexes.NewMulti(
+			sb, types.AccountNumberStoreKeyPrefix, "account_by_number", collections.Uint64Key, sdk.AccAddressKey,
+			func(_ sdk.AccAddress, v sdk.AccountI) (uint64, error) {
+				return v.GetAccountNumber(), nil
+			},
+		),
+	}
+}
+
 type AccountsIndexes struct {
 	// Number is a unique index that indexes accounts by their account number.
-	Number *indexes.Unique[uint64, sdk.AccAddress, sdk.AccountI]
+	Number      *indexes.Unique[uint64, sdk.AccAddress, sdk.AccountI]
+	NumberMulti *indexes.Multi[uint64, sdk.AccAddress, sdk.AccountI]
 }
 
 func (a AccountsIndexes) IndexesList() []collections.Index[sdk.AccAddress, sdk.AccountI] {
@@ -133,7 +145,7 @@ func NewAccountKeeper(
 		authority:     authority,
 		Params:        collections.NewItem(sb, types.ParamsKey, "params", codec.CollValue[types.Params](cdc)),
 		AccountNumber: collections.NewSequence(sb, types.GlobalAccountNumberKey, "account_number"),
-		Accounts:      collections.NewIndexedMap(sb, types.AddressStoreKeyPrefix, "accounts", sdk.AccAddressKey, codec.CollInterfaceValue[sdk.AccountI](cdc), NewAccountIndexes(sb)),
+		Accounts:      collections.NewIndexedMap(sb, types.AddressStoreKeyPrefix, "accounts", sdk.AccAddressKey, codec.CollInterfaceValue[sdk.AccountI](cdc), NewAccountIndexesMulti(sb)),
 	}
 	schema, err := sb.Build()
 	if err != nil {
