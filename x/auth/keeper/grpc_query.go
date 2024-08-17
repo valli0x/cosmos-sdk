@@ -34,12 +34,16 @@ func (s queryServer) AccountAddressByID(ctx context.Context, req *types.QueryAcc
 
 	accID := req.AccountId
 
-	address, err := s.k.Accounts.Indexes.Number.MatchExact(ctx, accID)
+	address, err := s.k.Accounts.Indexes.NumberMulti.MatchExact(ctx, accID)
 	if err != nil {
 		return nil, status.Errorf(codes.NotFound, "account address not found with account number %d", accID)
 	}
+	key, err := address.PrimaryKey()
+	if err != nil {
+		return nil, err
+	}
 
-	return &types.QueryAccountAddressByIDResponse{AccountAddress: address.String()}, nil
+	return &types.QueryAccountAddressByIDResponse{AccountAddress: key.String()}, nil
 }
 
 func (s queryServer) Accounts(ctx context.Context, req *types.QueryAccountsRequest) (*types.QueryAccountsResponse, error) {

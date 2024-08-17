@@ -88,7 +88,7 @@ type AccountsIndexes struct {
 
 func (a AccountsIndexes) IndexesList() []collections.Index[sdk.AccAddress, sdk.AccountI] {
 	return []collections.Index[sdk.AccAddress, sdk.AccountI]{
-		a.Number,
+		a.NumberMulti,
 	}
 }
 
