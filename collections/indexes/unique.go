@@ -3,7 +3,7 @@ package indexes
 import (
 	"context"
 	"errors"
-	"fmt"
+	// "fmt"
 
 	"cosmossdk.io/collections"
 	"cosmossdk.io/collections/codec"
@@ -52,13 +52,14 @@ func (i *Unique[ReferenceKey, PrimaryKey, Value]) Reference(ctx context.Context,
 	if err != nil {
 		return err
 	}
-	has, err := i.refKeys.Has(ctx, refKey)
-	if err != nil {
-		return err
-	}
-	if has {
-		return fmt.Errorf("%w: index uniqueness constrain violation: %s", collections.ErrConflict, i.refKeys.KeyCodec().Stringify(refKey))
-	}
+	// TODO
+	// has, err := i.refKeys.Has(ctx, refKey)
+	// if err != nil {
+	// 	return err
+	// }
+	// if has {
+	// 	return fmt.Errorf("%w: index uniqueness constrain violation: %s", collections.ErrConflict, i.refKeys.KeyCodec().Stringify(refKey))
+	// }
 	return i.refKeys.Set(ctx, refKey, pk)
 }
 
